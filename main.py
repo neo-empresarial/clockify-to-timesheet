@@ -3,7 +3,7 @@ import pandas as pd
 
 def main():
     """Control program flow"""
-    clockify_df = pd.read_csv('clockify-report.csv', encoding='utf-16le')
+    clockify_df = pd.read_csv('clockify-report.csv')
     clockify_df['Horas-aulas'] = clockify_df['Duration (decimal)']*1.2
 
     clockify_df.loc[clockify_df['Project'] == 'Feriado', ['Tags', 'Task']] = 'Feriado'
