@@ -4,3 +4,6 @@
 # .csv and .xls
 *.csv
 *.xlsx
+
+# pyenv
+.python-version

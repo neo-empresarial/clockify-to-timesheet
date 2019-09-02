@@ -7,6 +7,7 @@ def main():
     clockify_df['Horas-aulas'] = clockify_df['Duration (decimal)']*1.2
 
     clockify_df.loc[clockify_df['Project'] == 'Feriado', ['Tags', 'Task']] = 'Feriado'
+    clockify_df.loc[clockify_df['Project'] == 'Falta Justificada', ['Tags', 'Task']] = 'Falta Justificada'
 
     comments_df = clockify_df.loc[clockify_df['Task'] == 'Outros -> comente!',
                                   ['User', 'Project', 'Task', 'Tags',
@@ -20,6 +21,7 @@ def main():
     grp = clockify_df.groupby(['User', 'Tags', 'Project', 'Task'], as_index=False).sum()
     grp['Description'] = ''
     grp.loc[grp['Tags'] == 'Feriado', ['Tags', 'Task']] = ''
+    grp.loc[grp['Tags'] == 'Falta Justificada', ['Tags', 'Task']] = ''
     timesheet_df = pd.concat([grp[['User', 'Project', 'Task', 'Tags',
                                    'Horas-aulas', 'Description']], comments_df])
     timesheet_df.sort_values(by=['User', 'Project'], inplace=True)
