@@ -23,7 +23,7 @@ pipenv sync
 ```
 ### Rodando script
 
-No Clockify, entrar em [Detailed Reports](https://clockify.me/reports/detailed). Selecionar o intervalo desejado. Confirmar se não há nenhuma entrada de dado sem tag (_cliente_). Exportar para __csv__ com o nome __clockify_report.csv__ na pasta do programa. Rodar o script com:
+No Clockify, entrar em [Detailed Reports](https://clockify.me/reports/detailed). Selecionar o intervalo desejado. Confirmar se não há nenhuma entrada de dado sem tag (_cliente_). Coloque o __csv__ baixado na pasta do programa e execute o script usando:
 
 ```
 python main.py
