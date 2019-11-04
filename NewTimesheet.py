@@ -5,6 +5,7 @@ from datetime import date
 import pprint
 import os
 
+
 # Set global variables from .env file
 V1_API_URL = "https://api.clockify.me/api/v1"
 WORKSPACE_ID = os.getenv("CLOCKIFY_WORKSPACE_ID")
@@ -25,46 +26,42 @@ def gets_time_sunday():
     return sunday
 
 def gets_time_monday():
-    ''' Get the last week range ''' 
+    ''' Get the last week range '''
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
     monday = monday.strftime("%Y-%m-%dT01:00:00Z")
     return monday
 
 def taking_all_url_members(responses,sunday,monday):
-    ''' Takes the url of each member by id's '''
+    ''' Takes the url of each member by id's and the time entries to create dictionarys and input in the data frame '''
     users = {}
-    for response in responses_of_url():
+    dados_frame = pandas.DataFrame(columns = ['project_name','client_name','task_name','user_name','description','duration'])
+    dic_entry = {}
+    for response in responses:
         users[response['id']] = response['name']
     for user_id in users.keys():
         url_timeentry = "{}/workspaces/{}/user/{}/time-entries?start={}&end={}&hydrated={}".format(V1_API_URL, WORKSPACE_ID, user_id ,monday,sunday,True)
-        print(url_timeentry)
         timeentries_member = requests.get(url_timeentry, headers=HEADERS).json()
-    return timeentries_member
+        for time_entry in timeentries_member:
+            try:
+                client_name = time_entry['tags'][0]['name']
+            except IndexError:
+                continue
+            end = time_entry['timeInterval']['end']
+            end = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+            start = time_entry['timeInterval']['start']
+            start = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')            
+            duration = ((end-start).total_seconds())/3600
+            dic_entry['project_name'] = time_entry['project']['name']
+            dic_entry['client_name'] = client_name
+            dic_entry['task_name'] = time_entry['task']['name']
+            dic_entry['user_name'] = users[time_entry['userId']]
+            dic_entry['description'] = time_entry['description']
+            dic_entry['duration'] = duration
+            dados_frame = dados_frame.append(dic_entry , ignore_index=True)
+            print(dados_frame)
 
-def feeding_data_frame_with_timeentry(timeentries_member):
-    '''Takes the time entries and create dictionarys to input in the data frame'''  
-    dados_frame = pandas.DataFrame(columns = ['project_name','client_name','task_name','user_name','description','duration'])
-    dic_entry = {}
-    for time_entry in taking_all_url_members(timeentries_member):
-        try:
-            client_name = time_entry['tags'][0]['name']
-        except IndexError:
-            continue
-        end = time_entry['timeInterval']['end']
-        end = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
-        start = time_entry['timeInterval']['start']
-        start = datetime.datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')            
-        duration = ((end-start).total_seconds())/3600
-        dic_entry['project_name'] = time_entry['project']['name']
-        dic_entry['client_name'] = client_name
-        dic_entry['task_name'] = time_entry['task']['name']
-        dic_entry['user_name'] = users[time_entry['userId']]
-        dic_entry['description'] = time_entry['description']
-        dic_entry['duration'] = duration
-        dados_frame = dados_frame.append(dic_entry , ignore_index=True)
-
-        print(dados_frame)
+    return dados_frame
 
 
 def Organize_Data_Frame_create_excel (dados_frame):
@@ -88,7 +85,7 @@ def Organize_Data_Frame_create_excel (dados_frame):
 
     print("DONE!")
 
-    return dados_frame and timesheet_df
+    return timesheet_df
 
 
 def taking_timesheet_data():
@@ -97,23 +94,22 @@ def taking_timesheet_data():
     df = pandas.DataFrame(Time_sheet_2019, columns = ['user_name','project_name','task_name','client_name','Horas-aulas','description'])
     return df
 
-def feeding_timesheet(df):    
+def feeding_timesheet(df,timesheet_df,monday,sunday):    
     """Now Timesheet is geting ready"""
-    if ((df.user_name == dados_frame.user_name).bool and (df.client_name == dados_frame.client_name).bool and (df.project_name == dados_frame.project_name).bool and (df.task_name == dados_frame.task_name).bool) :
-        df['semana {} - {}'.format(monday,friday)] = dados_frame['Horas-aulas']
-        dados_frame['eliminar'] = 'x'
-        dados_frame.drop(dados_frame[dados_frame['eliminar'] == 'x'].index, axis = 0,inplace=True)
-        df = pandas.concat([df, dados_frame])
-    return (df, dados_frme) 
+    if ((df.user_name == timesheet_df.user_name).bool and (df.client_name == timesheet_df.client_name).bool and (df.project_name == timesheet_df.project_name).bool and (df.task_name == timesheet_df.task_name).bool) :
+        df['semana {} - {}'.format(monday,sunday)] = timesheet_df['Horas-aulas']
+        timesheet_df['eliminar'] = 'x'
+        timesheet_df.drop(timesheet_df[timesheet_df['eliminar'] == 'x'].index, axis = 0,inplace=True)
+        df = pandas.concat([df, timesheet_df])
+        print("Essa é  fim :\n", df)
+        print("Essa é dados: \n",timesheet_df)
+    return (df, timesheet_df) 
 
-responses_of_url()
-gets_time_monday()
-gets_time_sunday()
-taking_all_url_members(gets_time_monday,gets_time_sunday,responses_of_url)
-feeding_data_frame_with_timeentry(taking_all_url_members)
-Organize_Data_Frame_create_excel(feeding_data_frame_with_timeentry)
-taking_timesheet_data()
-feeding_data_frame_with_timeentry(taking_timesheet_data,Organize_Data_Frame_create_excel)
-
-print("Esse é df:\n", feeding_timesheet())
-print(" Esse é dados frame : \n ", )
+if __name__ == "__main__": 
+    responses = responses_of_url()
+    monday = gets_time_monday()
+    sunday = gets_time_sunday()
+    timeentries_member = taking_all_url_members(monday = monday,sunday = sunday,responses = responses)
+    organize = Organize_Data_Frame_create_excel(timeentries_member)
+    time_sheet = taking_timesheet_data()
+    feeding_timesheet(time_sheet,organize,monday = monday,sunday = sunday)
