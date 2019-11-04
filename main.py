@@ -5,11 +5,6 @@ import os
 def main():
     """Control program flow"""
 
-    for filename in os.listdir(os.getcwd()):
-        if filename.endswith(".csv"):
-            clockify_df = pd.read_csv(filename)
-            print("Reading file {}".format(filename))
-            break
             
     clockify_df['Horas-aulas'] = clockify_df['Duration (decimal)']*1.2
 
