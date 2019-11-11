@@ -20,7 +20,7 @@ def responses_of_url():
 def gets_time_sunday():
     ''' Get the last week range ''' 
     today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
+    monday = today - datetime.timedelta(days=today.weekday(), weeks=2)
     sunday = monday + datetime.timedelta(days=6)
     sunday = sunday.strftime("%Y-%m-%dT23:59:59Z")
     return sunday
@@ -28,7 +28,7 @@ def gets_time_sunday():
 def gets_time_monday():
     ''' Get the last week range '''
     today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
+    monday = today - datetime.timedelta(days=today.weekday(), weeks=2)
     monday = monday.strftime("%Y-%m-%dT01:00:00Z")
     return monday
 
@@ -103,6 +103,8 @@ def feeding_timesheet(df, timesheet_df, monday, sunday):
         df = pandas.concat([df, timesheet_df])
         print("Essa é  fim :\n", df)
         print("Essa é dados: \n", timesheet_df)
+        df.to_excel('Timesheet_test.xlsx', sheet_name = 'Timesheet', index = False, float_format = "%.2f")
+
     return (df, timesheet_df) 
 
 if __name__ == "__main__": 
