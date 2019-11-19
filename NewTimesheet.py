@@ -18,7 +18,7 @@ def responses_of_url():
     return responses
 
 def gets_time_sunday():
-    ''' Get the last week range ''' 
+    ''' Get the last sunday for the week's range''' 
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
     sunday = monday + datetime.timedelta(days=6)
@@ -26,7 +26,7 @@ def gets_time_sunday():
     return sunday
 
 def gets_time_monday():
-    ''' Get the last week range '''
+    ''' Get the last monday for the  week's range '''
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
     monday = monday.strftime("%Y-%m-%dT01:00:00Z")
