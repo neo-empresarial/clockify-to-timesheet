@@ -1,6 +1,11 @@
-# Timesheet Clockify
+# NewTimesheet
+Script para receber os dados semanais do clockify e coloca-los em uma planilha excel.
+O script faz a integração dos dados ja armazenados com os novos dados que são recebios a cada script. Desta forma, o arquivo excel se torna uma base de dados dos horarios trabalhados pelos membros do NEO.
 
-Script para transformar os dados do Clockify no formato da Timesheet do NEO Empresarial. Desenvolvido por LAB em 2019.1.
+O script faz as referências nescessárias e armazena os horários realizados da mesma atividade, colocando os dados em mesmas linhas mas em colunas diferentes.
+
+Script realizado por LDB em 2019.2
+
 
 ## Como usar
 
@@ -23,19 +28,11 @@ pipenv sync
 ```
 ### Rodando script
 
-No Clockify, entrar em [Detailed Reports](https://clockify.me/reports/detailed). Selecionar o intervalo desejado. Confirmar se não há nenhuma entrada de dado sem tag (_cliente_). Coloque o __csv__ baixado na pasta do programa e execute o script usando:
+O script automaticamente pega os dados referente ao intervalo de segunda a domingo da semana anterior. O nescessário é apenas executa o script com:
 
 ```
-python main.py
+python NewTimesheet.py
 ```
 
-O programa irá gerar um novo csv e um arquivo no formato do Excel que pode ser filtrado para facilitar o preenchimento da Timesheeto para os membros utilizando o Clockify.
+O programa irá gerar um novo arquivo no formato do Excel que será a base de dados da timesheet do semestre.
 
-## To-Do
-
-- [ ] Integrar com API do Clockify. Baixar automaticamente o arquivo csv da semana;
-- [ ] Fazer argumento para selecionar semana que deseja baixar;
-- [ ] Fazer Excel para transferir automaticamente para timesheet;
-- [ ] Integrar com BD do NEO;
-- [ ] Calcular métricas (IEP, PREP);
-- [ ] Integrar com metabase.
